@@ -1,7 +1,6 @@
 module.exports.getAll = (req, resp) => {
-  resp.status(200).json({
-
-  });
+  // resp.status(200).json({});
+  resp.json({message: 'Categories'});
 };
 
 module.exports.getById = (req, resp) => {
