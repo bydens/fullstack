@@ -1,22 +1,67 @@
-module.exports.getAll = (req, resp) => {
-  // resp.status(200).json({});
-  resp.json({message: 'Categories'});
+const Category = require('../models/Category');
+const Position = require('../models/Position')
+const errorHandler = require('../utils/errorHandler');
+
+module.exports.getAll = async (req, resp) => {
+  try {
+    const categories = await Category.find({user: req.user.id});
+    resp.status(200).json(categories);
+  } catch (e) {
+    errorHandler(resp, e);
+  }
 };
 
-module.exports.getById = (req, resp) => {
-  resp.status(200).json({
+module.exports.getById = async (req, resp) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    resp.status(200).json(category);
+  } catch (e) {
+    errorHandler(resp, e);
+  }
+};
+
+module.exports.remove = async (req, resp) => {
+  try {
+    await Category.remove({_id: req.params.id});
+    await Position.remove({category: req.params.id});
+    resp.status(200).json({
+      message: 'Category deleted'
+    })
+  } catch (e) {
+    errorHandler(resp, e);
+  }
+};
+
+module.exports.create = async (req, resp) => {
+  const category = new Category({
+    name: req.body.name,
+    user: req.user.id,
+    imageSrc: req.file ? req.file.path : ''
   });
+  try {
+    await category.save();
+    resp.status(201).json(category);
+  } catch (e) {
+    errorHandler(resp, e);
+  }
 };
 
-module.exports.remove = (req, resp) => {
-};
+module.exports.update = async (req, resp) => {
+  const updated = {
+    name: req.body.name
+  };
 
-module.exports.create = (req, resp) => {
-  resp.status(200).json({
-  });
-};
-
-module.exports.update = (req, resp) => {
-  resp.status(200).json({
-  });
+  if (req.file) {
+    updated.imageSrc = req.file.path
+  }
+  try {
+    const category = await Category.findOneAndUpdate(
+        {_id: req.params.id},
+        {$set: updated},
+        {new: true}
+    );
+    resp.status(200).json(category);
+  } catch (e) {
+    errorHandler(resp, e);
+  }
 };
