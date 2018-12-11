@@ -1,4 +1,4 @@
-const  express =require('express');
+const express =require('express');
 const passport = require('passport');
 const upload = require('../middlaware/upload');
 const controller = require('../controllers/category');
